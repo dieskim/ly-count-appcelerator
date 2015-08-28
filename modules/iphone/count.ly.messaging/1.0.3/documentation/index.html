@@ -1,0 +1,248 @@
+<h1>Count.ly Titanium iOS Messaging Module</h1>
+<p>Countly is an innovative, real-time, open source mobile analytics application. It collects data from mobile phones, and visualizes this information to analyze mobile application usage and end-user behavior. There are two parts of Countly: the server that collects and analyzes data, and mobile SDK that sends this data (for iOS &amp; Android).</p>
+<p>Countly:</p>
+<ul>
+<li><a href="https://count.ly">Countly (Countly)</a></li>
+</ul>
+<p>Countly Server;</p>
+<ul>
+<li><a href="https://github.com/Countly/countly-server">Countly Server (countly-server)</a></li>
+</ul>
+<p>Titanium Countly Messaging Modules
+- <a href="https://github.com/dieskim/Titanium-Count.ly-Android-Messaging">Countly Titanium Android Messaging Module</a>
+- <a href="https://github.com/dieskim/Titanium-Count.ly-Messaging">Countly Titanium iOS Messaging Module</a></p>
+<p>Other Countly SDK repositories;</p>
+<ul>
+<li><a href="https://github.com/Countly/countly-sdk-android">Countly Android SDK (countly-sdk-android)</a></li>
+<li><a href="https://github.com/Countly/countly-sdk-ios">Countly iOS SDK (countly-sdk-ios)</a></li>
+</ul>
+<p>Countly SDK Guides;
+- <a href="http://resources.count.ly/v1.0/docs/countly-push-for-android">Countly Android Messaging Guide</a>
+- <a href="">Countly iOS Messaging Guide</a>http://resources.count.ly/v1.0/docs/countly-push-for-ios</p>
+<h2>This Titanium iOS module is written to take use of all the Count.ly functions - including events,userData and Messaging.</h2>
+<h2>It is written with functions as close to the Android module as possible to create uniformed functions.</h2>
+<h2>Please note that this Module is under development.</h2>
+<h2>Please log issues via github issues</h2>
+<h2>Any pull requests and suggestio welcome!</h2>
+<h2>Author: Dieskim</h2>
+<h2>Development Sponsor: http://Hamsane.com - Friend who loves your way of working - Thanks!</h2>
+<h2>Installation</h2>
+<ol>
+<li>Go to: https://github.com/dieskim/Titanium-Count.ly-Messaging</li>
+<li>Download: count.ly-messaging-iphone-x.x.x.zip</li>
+<li>Move Zip to root of your Application </li>
+</ol>
+<h3>Register your module with your application by editing <code>tiapp.xml</code> and adding your module.</h3>
+<p><code>&lt;modules&gt;
+&lt;module platform="iphone"&gt;count.ly.messaging&lt;/module&gt;
+&lt;/modules&gt;</code></p>
+<h2>Usage</h2>
+<p><strong>Require the Count.ly Module</strong>
+<code>var Countly = require('count.ly.messaging');</code></p>
+<p><strong>Start Count.ly on own server without Messaging</strong>
+<code>Countly.start('APP_KEY','http://YOUR_HOST.com');</code></p>
+<p><strong>Start Count.ly on cloud without Messaging</strong>
+<code>Countly.startOnCloud('APP_KEY');</code></p>
+<h3>SETUP Count.ly WITH Messaging - Push</h3>
+<p><strong>Require the Count.ly Module</strong>
+<code>var Countly = require('count.ly.messaging');</code></p>
+<p><strong>Set Push Setup functions</strong>
+```
+// START FUNCTION - registerForPush
+function registerForPush() {
+Ti.Network.registerForPushNotifications({
+success: deviceTokenSuccess,
+error: deviceTokenError,
+callback: receivePush
+});</p>
+<p>// Remove event listener once registered for push notifications
+Ti.App.iOS.removeEventListener('usernotificationsettings', registerForPush); 
+};
+// END FUNCTION - registerForPush</p>
+<p>// addEventListener to Wait for user settings to be registered before registering for push notifications
+Ti.App.iOS.addEventListener('usernotificationsettings', registerForPush);</p>
+<p>// Start Function - deviceTokenSuccess
+function deviceTokenSuccess(e) {</p>
+<p>// get Ti.App.Properties - pushSubscribed - to check if already subscribed or not
+var pushSubscribed = Ti.App.Properties.getString('pushSubscribed',false);
+Ti.API.log('pushSubscribed Value: ' + pushSubscribed);<br />
+</p>
+<p>// START IF - not subscribed then subscribe
+if (pushSubscribed != true){</p>
+<p>Ti.API.log("Not Subscribed to Count.ly Push - Subscribe with deviceToken: " + e.deviceToken);</p>
+<p>// run Count.ly Register Device for Push
+Countly.registerDeviceSuccess(e.deviceToken);</p>
+<p>// Set Ti.App.Properties push_channels
+Ti.App.Properties.setString('pushSubscribed',true); </p>
+<p>}else{</p>
+<p>Ti.API.log('Already Subscribed to Count.ly Push, wont subscribe again!');</p>
+<p>};
+// END IF - not subscribed then subscribe    <br />
+</p>
+<p>};
+// End Function - deviceTokenSuccess</p>
+<p>// Start Function - deviceTokenError
+function deviceTokenError(e) {</p>
+<p>Ti.API.log("Failed to Find Token" + e.error);</p>
+<p>// run Count.ly Register registerDeviceError
+Countly.registerDeviceError();</p>
+<p>};
+// End Function - deviceTokenError</p>
+<p>```</p>
+<p><strong>START Countly with Messaging - DEVELOPMENT TEST</strong>
+<code>Countly.setMessagingDeveloperMode();    // setMessagingDeveloperMode
+Countly.startMessagingTest('YOUR_APP_KEY','http://yourserver.com');</code></p>
+<p><strong>START Countly with Messaging - PRODUCTION</strong>
+<code>Countly.startMessaging('YOUR_APP_KEY','http://yourserver.com');</code></p>
+<p><strong>Receive and Process push on Titanium side</strong>
+```
+// START FUNCTION - receivePush for iOS
+function receivePush(pushMessage) {       <br />
+</p>
+<p>// Ti.API.info Raw pushMessage
+Ti.API.info("Received Push:" + JSON.stringify(pushMessage));<br />
+</p>
+<p>//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                  pushMessage EXAMPLE                                 //
+//                                                                                                      //
+//          {"code":0,                                                                                  //
+//          "data":{    "alert":"Test Message",                                                         //
+//                      "category":"[CLY]_url",                                                         //
+//                      "c":{"l":"http://count.ly","i":"551b9d03f593a55e11ea62c0"},                     //
+//                      "sound":"default",                                                              //
+//                      "aps":{"category":"[CLY]_url","sound":"default","alert":"test5"}                //
+//                  },                                                                                  //
+//          "type":"remote",                                                                            //
+//          "source":{},                                                                                //
+//          "inBackground":true,                                                                        //
+//          "success":true};                                                                            //
+//                                                                                                      //
+//////////////////////////////////////////////////////////////////////////////////////////////////////////</p>
+<p>// pushData
+var pushData = pushMessage.data;</p>
+<p>// set pushUserInfoDictionary
+var pushUserInfoDictionary = {userInfoDictionary: pushMessage.data.c};<br />
+// run Count.ly record Push Opened<br />
+Countly.recordPushOpen(pushUserInfoDictionary); </p>
+<p>// START IF - Set pushAlertMessage
+if (pushMessage.data.alert){</p>
+<p>var pushAlertMessage = pushMessage.data.alert;</p>
+<p>};
+// END IF -  Set pushAlertMessage </p>
+<p>// START IF - Set PUSH CATEGORY TYPE - check more here - http://resources.count.ly/v1.0/docs/countly-push-for-ios
+if (pushMessage.data.c.l) {</p>
+<p>var pushType = "hasLink";
+var pushLink = pushMessage.data.c.l;</p>
+<p>///////////////////////////////////////////////////////////
+//              SHOW AN LINK ALERT HERE                 //
+// 1. Use info  - pushType
+//              - pushLink
+//              - pushAlertMessage
+// 2. Once user Takes action log action with</p>
+<p>// Count.ly record Push Action<br />
+// Countly.recordPushAction(pushUserInfoDictionary);  <br />
+</p>
+<p>//////////////////////////////////////////////////////////</p>
+<p>} else if (pushMessage.data.c.r) {</p>
+<p>var pushType = "hasReview";</p>
+<p>// SHOW AN REVIEW ALERT HERE </p>
+<p>} else if (pushMessage.data.c.u) {</p>
+<p>var pushType = "hasUpdate";</p>
+<p>// SHOW AN UPDATE ALERT HERE</p>
+<p>} else {</p>
+<p>var pushType = "hasMessage";</p>
+<p>// SHOW NORMAL ALERT HERE</p>
+<p>};
+// END IF - Set PUSH CATEGORY TYPE</p>
+<p>};
+// END FUNCTION - receivePush for iOS
+```</p>
+<p><strong>Set User Location - Enterprise Only</strong></p>
+<p><code>// Countly Set user location
+// - Takes two strings: latitudeString and longitudeString of 2 digit lengths
+var latitudeString = 12;
+var longitudeString = 10;
+Countly.setLocation(latitudeString,longitudeString);</code></p>
+<h3>Count.ly Record Events</h3>
+<p><strong>Set any of the following Fields in an Object</strong></p>
+<p><code>var segmentation = {device:"iPhone 4S", country:"USA"};
+var eventData = {name: "keySegmentationCountSum", segmentation:segmentation, count: 1, sum: 0.99};</code>
+- name (required) : Name of the event to track<br />
+- <em>(example - Track clicks on the help button "clickedHelp" )</em>
+- count (required) : Number to increment the event in the db
+- <em>(example - User purchases item increment by 1 )</em>
+- sum : If the event is tied to an overall numerical data, such as a purchase, we can use sum to keep track of that
+- <em>(example - 0.99)</em>
+- segmentation : Categorization of the event
+- <em>(example - User is from USA and uses an iPhone 4S so the segmentation will be {device:"iPhone 4S", country:"USA"} )</em></p>
+<p><strong>Track Events Examples</strong></p>
+<p>```
+var segmentation = {device:"iPhone 4S", country:"USA"};</p>
+<p>Ti.API.log("Send keyCount Event");
+var eventData = {name: "keyCount", count: 1};
+Countly.event(eventData);</p>
+<p>Ti.API.log("Send keyCountSum Event");
+var eventData = {name: "keyCountSum", count: 1, sum: 0.99};
+Countly.event(eventData);</p>
+<p>Ti.API.log("Send keySegmentationCount Event");
+var eventData = {name: "keySegmentationCount", segmentation:segmentation, count: 1};
+Countly.event(eventData);</p>
+<p>Ti.API.log("Send keySegmentationCountSum Event");
+var eventData = {name: "keySegmentationCountSum", segmentation:segmentation, count: 1, sum: 0.99};
+Countly.event(eventData);
+```</p>
+<h3>Set UserData</h3>
+<p><strong>Set any of the following Fields in an Object</strong></p>
+<p><strong>Set userData{} as information about user
+</strong>Possible keys are:</p>
+<ul>
+<li>name - (String) providing user's full name</li>
+<li>username - (String) providing user's nickname</li>
+<li>email - (String) providing user's email address</li>
+<li>organization - (String) providing user's organization's name where user works</li>
+<li>phone - (String) providing user's phone number</li>
+<li>picture - (String) providing WWW URL to user's avatar or profile picture</li>
+<li>picturePath - (String) providing local path to user's avatar or profile picture</li>
+<li>gender - (String) providing user's gender as M for male and F for female</li>
+<li>byear - (int) providing user's year of birth as integer
+<code>var userData = {    name: "testName",
+username: "testUsername",
+email: "testemail@gmail.com",
+organization: "testOrg",
+phone: "testPhone",
+picture: "https://count.ly/wp-content/uploads/2014/10/logo.png",
+picturePath: "/images/appicon.png",
+gender: "M",
+byear: "1980",
+};</code></li>
+</ul>
+<p><strong>Set customUserData{} as information about user with custom properties
+</strong>In customUserData you can provide any string key values to be stored with user</p>
+<p><code>var customUserData = {  key1: "value1",
+key2:"value2",
+};</code></p>
+<p><strong>Set Userdata as set in userData and customData
+</strong>Can contain both userData and customData - or just userdata</p>
+<p>```
+Ti.API.log("Set UserData");
+var args = {    userData:userData,
+customUserData:customUserData,
+};</p>
+<p>Countly.userData(args);
+```</p>
+<h3>Metrics Data</h3>
+<p><code>console.log('device',countly.device);
+console.log('deviceName',countly.deviceName);
+console.log('devicePlatform',countly.platform)
+console.log('multitaskingSupported',countly.multitaskingSupported);
+console.log('orientation', countly.orientation);
+console.log('osVersion', countly.osVersion);
+console.log('carrier', countly.carrier);
+console.log('resolution', countly.resolution);
+console.log('locale',countly.locale);
+console.log('appVersion',countly.appVersion);
+console.log('osVersion',countly.osVersion);</code></p>
+<h2>Author</h2>
+<p>Author: Dieskim</p>
+<h2>License</h2>
+<p>MIT as in License.txt</p>

@@ -1,0 +1,10 @@
+<Alloy>
+	<Window id="window" class="container">
+		<Button onClick="logEvent">Log Event</Button>
+		<Button onClick="setUserData">Set User Data</Button>
+		<Button onClick="addCrashLog">Add Crash Log Entry</Button>
+		<Button onClick="runNativeCrashTest">Run Native Crash Test (Click Many Times)</Button>
+		<Button onClick="runFatalCrashTest">Run Fatal Crash Test</Button>
+		<Button onClick="runNonFatalCrashTest">Run Non Fatal Crash Test</Button>
+	</Window>
+</Alloy>
