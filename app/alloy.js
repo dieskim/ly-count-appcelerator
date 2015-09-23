@@ -73,23 +73,51 @@ if (OS_ANDROID){
 	
 }else{
 	
-	// START FUNCTION - registerForPush
-	function registerForPush() {
-	    Ti.Network.registerForPushNotifications({
-	                        success: deviceTokenSuccess,
-	                        error: deviceTokenError,
-	                        callback: receivePush
+	// START IF - iOS > 8
+	if (Ti.Platform.name == "iPhone OS" && parseInt(Ti.Platform.version.split(".")[0]) >= 8) {
+	
+		// START FUNCTION - registerForPush
+		function registerForPush() {
+		    Ti.Network.registerForPushNotifications({
+		                        success: deviceTokenSuccess,
+		                        error: deviceTokenError,
+		                        callback: receivePush
+		    });
+		
+		    // Remove event listener once registered for push notifications
+		    Ti.App.iOS.removeEventListener('usernotificationsettings', registerForPush); 
+		};
+		// END FUNCTION - registerForPush
+		
+		
+		// addEventListener to Wait for user settings to be registered before registering for push notifications
+		Ti.App.iOS.addEventListener('usernotificationsettings', registerForPush);
+	
+		 // Register notification types to use
+	    Ti.App.iOS.registerUserNotificationSettings({
+		    types: [
+	            Ti.App.iOS.USER_NOTIFICATION_TYPE_ALERT,
+	            Ti.App.iOS.USER_NOTIFICATION_TYPE_SOUND,
+	            Ti.App.iOS.USER_NOTIFICATION_TYPE_BADGE
+	        ]
 	    });
-	
-	    // Remove event listener once registered for push notifications
-	    Ti.App.iOS.removeEventListener('usernotificationsettings', registerForPush); 
+	    
+	} else {  // ELSE for iOS 7 and earlier
+		
+	    Ti.Network.registerForPushNotifications({
+	        // Specifies which notifications to receive
+	        types: [
+	            Ti.Network.NOTIFICATION_TYPE_BADGE,
+	            Ti.Network.NOTIFICATION_TYPE_ALERT,
+	            Ti.Network.NOTIFICATION_TYPE_SOUND
+	        ],
+	        success: deviceTokenSuccess,
+	        error: deviceTokenError,
+	        callback: receivePush
+	    });
 	};
-	// END FUNCTION - registerForPush
-	
-	
-	// addEventListener to Wait for user settings to be registered before registering for push notifications
-	Ti.App.iOS.addEventListener('usernotificationsettings', registerForPush);
-	
+	// END IF - iOS > 8	
+
 	// Start Function - deviceTokenSuccess
 	function deviceTokenSuccess(e) {
 	
@@ -228,12 +256,15 @@ if (OS_ANDROID){
 
 }else{
 	
+	//Start Count.ly on own server without Messaging
+	//Countly.start('COUNLY_APP_KEY',http://yourserver.com');
+	
 	// START Countly with Messaging - DEVELOPMENT TEST
 	Countly.setMessagingDeveloperMode();    // setMessagingDeveloperMode
-	Countly.startMessagingTest('COUNLY_APP_KEY','http://yourserver.com');
+	Countly.startMessagingTest('COUNLY_APP_KEY', 'http://yourserver.com');
 	
 	//START Countly with Messaging - PRODUCTION
-	//Countly.startMessaging('COUNLY_APP_KEY','http://yourserver.com');
+	//Countly.startMessaging('YOUR_APP_KEY','http://yourserver.com');
 	
 }
 
