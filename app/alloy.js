@@ -14,10 +14,10 @@
 var Countly = require('count.ly.messaging');
 
 //Start Count.ly on own server without Messaging
-//Countly.start('APP_KEY','http://YOUR_HOST.com');
+//Countly.start('COUNTLY_APPKEY','http://YOUR_HOST.com');
 
 //Start Count.ly on cloud without Messaging
-//Countly.startOnCloud('APP_KEY');
+//Countly.startOnCloud('COUNTLY_APPKEY');
 
 // START IF - ENABLE DEBUGGING
 if (OS_ANDROID){
@@ -221,22 +221,22 @@ if (OS_ANDROID){
 if (OS_ANDROID){
 
 	// START Countly with Messaging - DEVELOPMENT TEST
-	Countly.startMessagingTest('COUNLY_APP_KEY','http://yourserver.com','GCM_PROJECT_ID');
+	Countly.startMessagingTest('COUNTLY_APP_KEY','http://yourserver.com','GCM_PROJECT_NUMBER');
 	
 	// START Countly with Messaging - PRODUCTION
-	//Countly.startMessaging('COUNLY_APP_KEY','http://yourserver.com','GCM_PROJECT_ID');
+	//Countly.startMessaging('COUNTLY_APP_KEY','http://yourserver.com','GCM_PROJECT_NUMBER');
 
 }else{
 	
 	//Start Count.ly on own server without Messaging
-	//Countly.start('COUNLY_APP_KEY','http://yourserver.com');
+	//Countly.start('COUNTLY_APP_KEY','http://yourserver.com');
 	
 	// START Countly with Messaging - DEVELOPMENT TEST
 	Countly.setMessagingDeveloperMode();    // setMessagingDeveloperMode
-	Countly.startMessagingTest('COUNLY_APP_KEY', 'http://yourserver.com');
+	Countly.startMessagingTest('COUNTLY_APP_KEY','http://yourserver.com');
 	
 	//START Countly with Messaging - PRODUCTION
-	//Countly.startMessaging('YOUR_APP_KEY','http://yourserver.com');
+	//Countly.startMessaging('COUNTLY_APP_KEY','http://yourserver.com');
 	
 }
 
@@ -279,6 +279,17 @@ function setUserData(){
 	Countly.userData(args);
 
 };
+
+function setLocation(){
+	
+	Ti.API.log("setLocation");
+	
+	var latitudeString = 12;
+	var longitudeString = 10;
+						
+	Countly.setLocation(latitudeString,longitudeString);	
+	
+}
 
 // Start Crash Reporting
 //Countly.startCrashReporting();
