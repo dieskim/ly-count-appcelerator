@@ -4,7 +4,7 @@
 https://github.com/dieskim/ly-count-appcelerator
 
 ### Any pull requests and suggestions welcome!
-### Author: Dieskim of (Kiteplans.info)](https://www.kiteplans.info)
+### Author: Dieskim of (dieskim.me)](https://www.dieskim.me)
 
 ## Installation
 
@@ -449,7 +449,7 @@ Countly.crashTest(4);
 
 ## Author
 
-Author: Dieskim of (Kiteplans.info)](https://www.kiteplans.info)
+Author: Dieskim of (dieskim.me)](https://www.dieskim.me)
 
 ## License
 
